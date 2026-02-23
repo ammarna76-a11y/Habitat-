@@ -1,0 +1,1447 @@
+<!DOCTYPE html>
+<html lang="ar" dir="rtl">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<meta name="theme-color" content="#0a0014">
+<meta name="apple-mobile-web-app-capable" content="yes">
+<meta name="apple-mobile-web-app-status-bar-style" content="black-translucent">
+<meta name="apple-mobile-web-app-title" content="مسار الزراعة">
+<title>مسار الزراعة — Cultivation Path</title>
+<style>/* System Arabic fonts */</style>
+<style>
+/* ═══════════════════════════════════════════════
+   ROOT & RESET
+═══════════════════════════════════════════════ */
+:root {
+  --bg:        #07000f;
+  --bg2:       #0e0020;
+  --surface:   #120025;
+  --card:      #1a0035;
+  --card2:     #220045;
+  --border:    rgba(180,100,255,0.15);
+  --border2:   rgba(180,100,255,0.3);
+  --purple:    #9b30ff;
+  --purple2:   #c060ff;
+  --gold:      #ffd700;
+  --gold2:     #ffaa00;
+  --cyan:      #00e5ff;
+  --crimson:   #ff2244;
+  --emerald:   #00ff88;
+  --text:      #e8d5ff;
+  --muted:     #7a5a99;
+  --white:     #ffffff;
+
+  --r1: #3d1a6e; --r1l: #7c4dbb;
+  --r2: #4a1080; --r2l: #9040d0;
+  --r3: #5510a0; --r3l: #a050e8;
+  --r4: #6210b8; --r4l: #b060ff;
+  --r5: #7020cc; --r5l: #c070ff;
+  --r6: #8030e0; --r6l: #d080ff;
+  --r7: #401000; --r7l: #ffa030;
+  --r8: #4a1200; --r8l: #ffb840;
+  --r9: #1a0800; --r9l: #ffd700;
+}
+
+*, *::before, *::after { margin:0; padding:0; box-sizing:border-box; }
+
+html { scroll-behavior: smooth; }
+
+body {
+  background: var(--bg);
+  color: var(--text);
+  font-family: 'Segoe UI', Tahoma, Arial, sans-serif;
+  min-height: 100vh;
+  overflow-x: hidden;
+  -webkit-font-smoothing: antialiased;
+}
+
+/* Cosmic background */
+body::before {
+  content: '';
+  position: fixed; inset: 0;
+  background:
+    radial-gradient(ellipse 800px 600px at 10% 0%, rgba(120,40,220,0.12) 0%, transparent 60%),
+    radial-gradient(ellipse 600px 400px at 90% 100%, rgba(80,0,160,0.1) 0%, transparent 60%),
+    radial-gradient(ellipse 400px 300px at 50% 50%, rgba(60,0,120,0.06) 0%, transparent 70%);
+  pointer-events: none; z-index: 0;
+}
+
+/* Stars */
+body::after {
+  content: '';
+  position: fixed; inset: 0;
+  background-image:
+    radial-gradient(1px 1px at 20% 30%, rgba(255,255,255,0.4) 0%, transparent 100%),
+    radial-gradient(1px 1px at 80% 10%, rgba(255,255,255,0.3) 0%, transparent 100%),
+    radial-gradient(1px 1px at 40% 70%, rgba(255,255,255,0.2) 0%, transparent 100%),
+    radial-gradient(1px 1px at 65% 45%, rgba(255,255,255,0.35) 0%, transparent 100%),
+    radial-gradient(1px 1px at 10% 80%, rgba(255,255,255,0.25) 0%, transparent 100%),
+    radial-gradient(1px 1px at 90% 60%, rgba(255,255,255,0.3) 0%, transparent 100%),
+    radial-gradient(1.5px 1.5px at 55% 15%, rgba(200,150,255,0.5) 0%, transparent 100%),
+    radial-gradient(1px 1px at 30% 55%, rgba(255,255,255,0.2) 0%, transparent 100%);
+  pointer-events: none; z-index: 0; animation: starTwinkle 8s ease-in-out infinite alternate;
+}
+
+@keyframes starTwinkle { to { opacity: 0.4; } }
+
+/* ═══════════════════════════════════════════════
+   LAYOUT
+═══════════════════════════════════════════════ */
+.app { position: relative; z-index: 1; max-width: 480px; margin: 0 auto; min-height: 100vh; display: flex; flex-direction: column; }
+
+/* ═══════════════════════════════════════════════
+   SCREENS
+═══════════════════════════════════════════════ */
+.screen { display: none; flex-direction: column; flex: 1; animation: screenIn 0.4s ease; }
+.screen.active { display: flex; }
+@keyframes screenIn { from { opacity: 0; transform: translateY(12px); } to { opacity: 1; transform: translateY(0); } }
+
+/* ═══════════════════════════════════════════════
+   HEADER
+═══════════════════════════════════════════════ */
+.top-bar {
+  display: flex; align-items: center; justify-content: space-between;
+  padding: 20px 20px 12px;
+  border-bottom: 1px solid var(--border);
+  background: rgba(10,0,20,0.8);
+  backdrop-filter: blur(20px);
+  position: sticky; top: 0; z-index: 100;
+}
+
+.top-bar .logo {
+  font-family: Georgia, 'Times New Roman', serif;
+  font-size: 18px; font-weight: 700;
+  background: linear-gradient(135deg, var(--purple2), var(--gold));
+  -webkit-background-clip: text; -webkit-text-fill-color: transparent;
+}
+
+.top-bar .logo span { font-size: 11px; display: block; font-family: 'Segoe UI', Tahoma, Arial, sans-serif; font-weight: 300; color: var(--muted); -webkit-text-fill-color: var(--muted); }
+
+.icon-btn {
+  width: 38px; height: 38px; border-radius: 10px;
+  background: var(--card); border: 1px solid var(--border);
+  color: var(--muted); font-size: 18px;
+  display: flex; align-items: center; justify-content: center;
+  cursor: pointer; transition: all 0.2s;
+}
+.icon-btn:hover { border-color: var(--purple); color: var(--purple2); }
+
+/* ═══════════════════════════════════════════════
+   HOME SCREEN
+═══════════════════════════════════════════════ */
+.home-content { padding: 16px; flex: 1; overflow-y: auto; padding-bottom: 100px; }
+
+/* Summary strip */
+.summary-strip {
+  display: grid; grid-template-columns: repeat(3, 1fr);
+  gap: 10px; margin-bottom: 20px;
+}
+
+.summary-card {
+  background: var(--card); border: 1px solid var(--border);
+  border-radius: 14px; padding: 14px 10px; text-align: center;
+  transition: all 0.2s;
+}
+.summary-card:hover { border-color: var(--border2); transform: translateY(-2px); }
+.summary-card .val { font-size: 26px; font-weight: 900; line-height: 1; }
+.summary-card .lbl { font-size: 10px; color: var(--muted); margin-top: 4px; }
+.val-purple { background: linear-gradient(135deg, var(--purple), var(--purple2)); -webkit-background-clip: text; -webkit-text-fill-color: transparent; }
+.val-gold { background: linear-gradient(135deg, var(--gold2), var(--gold)); -webkit-background-clip: text; -webkit-text-fill-color: transparent; }
+.val-cyan { background: linear-gradient(135deg, #00bbdd, var(--cyan)); -webkit-background-clip: text; -webkit-text-fill-color: transparent; }
+
+/* Section title */
+.section-title {
+  font-size: 11px; font-weight: 700; letter-spacing: 0.12em;
+  color: var(--muted); text-transform: uppercase;
+  margin-bottom: 12px; display: flex; align-items: center; gap: 8px;
+}
+.section-title::after { content: ''; flex: 1; height: 1px; background: var(--border); }
+
+/* Habit cards */
+.habits-container { display: flex; flex-direction: column; gap: 12px; }
+
+.habit-card {
+  background: var(--card);
+  border: 1px solid var(--border);
+  border-radius: 18px;
+  padding: 18px;
+  cursor: pointer;
+  transition: all 0.25s;
+  position: relative; overflow: hidden;
+}
+.habit-card::before {
+  content: ''; position: absolute; top: 0; right: 0; bottom: 0;
+  width: 3px; border-radius: 0 18px 18px 0;
+  background: var(--rank-color, var(--purple));
+}
+.habit-card:hover { border-color: var(--border2); transform: translateX(-3px); }
+.habit-card.completed { background: rgba(0,255,136,0.04); border-color: rgba(0,255,136,0.2); }
+
+.habit-top { display: flex; align-items: center; gap: 12px; margin-bottom: 12px; }
+
+.habit-emoji-wrap {
+  width: 46px; height: 46px; border-radius: 13px;
+  background: var(--surface); border: 1px solid var(--border);
+  display: flex; align-items: center; justify-content: center;
+  font-size: 22px; flex-shrink: 0;
+  position: relative;
+}
+
+.habit-info { flex: 1; min-width: 0; }
+.habit-name { font-size: 15px; font-weight: 700; margin-bottom: 3px; white-space: nowrap; overflow: hidden; text-overflow: ellipsis; }
+
+.rank-badge {
+  display: inline-flex; align-items: center; gap: 4px;
+  font-size: 10px; font-weight: 700; letter-spacing: 0.08em;
+  padding: 2px 8px; border-radius: 20px;
+  background: var(--rank-bg, rgba(120,40,220,0.2));
+  color: var(--rank-color, var(--purple2));
+  border: 1px solid var(--rank-color, var(--purple));
+}
+
+.check-circle {
+  width: 36px; height: 36px; border-radius: 50%;
+  border: 2px solid var(--muted);
+  background: transparent; cursor: pointer;
+  display: flex; align-items: center; justify-content: center;
+  font-size: 16px; color: transparent;
+  transition: all 0.2s; flex-shrink: 0;
+}
+.check-circle.done {
+  background: var(--emerald); border-color: var(--emerald);
+  color: #000; box-shadow: 0 0 16px rgba(0,255,136,0.4);
+}
+
+/* XP Bar */
+.xp-bar-wrap { margin-bottom: 8px; }
+.xp-bar-top { display: flex; justify-content: space-between; font-size: 10px; color: var(--muted); margin-bottom: 4px; }
+.xp-bar-track { height: 4px; background: rgba(255,255,255,0.06); border-radius: 2px; overflow: hidden; }
+.xp-bar-fill { height: 100%; border-radius: 2px; transition: width 0.8s cubic-bezier(0.34,1.56,0.64,1); background: linear-gradient(90deg, var(--rank-color, var(--purple)), var(--purple2)); }
+
+.habit-stats { display: flex; gap: 12px; }
+.hstat { font-size: 11px; color: var(--muted); display: flex; align-items: center; gap: 3px; }
+.hstat span { color: var(--text); font-weight: 600; }
+
+/* Essence orb */
+.essence-row { display: flex; align-items: center; gap: 8px; margin-top: 8px; }
+.essence-label { font-size: 10px; color: var(--muted); }
+.essence-orbs { display: flex; gap: 3px; }
+.orb { width: 8px; height: 8px; border-radius: 50%; background: rgba(255,255,255,0.1); transition: all 0.3s; }
+.orb.filled { background: radial-gradient(circle at 35% 35%, #e0b0ff, var(--purple)); box-shadow: 0 0 4px rgba(155,48,255,0.6); }
+.orb.gold-orb { background: radial-gradient(circle at 35% 35%, #ffe080, var(--gold)); box-shadow: 0 0 4px rgba(255,215,0,0.6); }
+
+/* Empty state */
+.empty-state { text-align: center; padding: 60px 24px; }
+.empty-icon { font-size: 56px; margin-bottom: 20px; animation: floatIcon 3s ease-in-out infinite; }
+@keyframes floatIcon { 0%,100%{transform:translateY(0)} 50%{transform:translateY(-10px)} }
+.empty-title { font-family: Georgia, 'Times New Roman', serif; font-size: 22px; color: var(--purple2); margin-bottom: 8px; }
+.empty-sub { font-size: 13px; color: var(--muted); line-height: 1.7; }
+
+/* ═══════════════════════════════════════════════
+   ADD HABIT SCREEN
+═══════════════════════════════════════════════ */
+.add-content { padding: 24px 20px; flex: 1; overflow-y: auto; padding-bottom: 100px; }
+
+.form-group { margin-bottom: 22px; }
+.form-label { font-size: 11px; font-weight: 700; letter-spacing: 0.1em; color: var(--muted); text-transform: uppercase; margin-bottom: 8px; display: block; }
+
+.form-input {
+  width: 100%; background: var(--card); border: 1px solid var(--border);
+  color: var(--text); padding: 14px 16px; border-radius: 14px;
+  font-family: 'Segoe UI', Tahoma, Arial, sans-serif; font-size: 15px;
+  outline: none; transition: border-color 0.2s; text-align: right;
+}
+.form-input:focus { border-color: var(--purple); box-shadow: 0 0 0 3px rgba(155,48,255,0.1); }
+.form-input::placeholder { color: var(--muted); }
+
+/* Emoji picker */
+.emoji-grid {
+  display: grid; grid-template-columns: repeat(6, 1fr);
+  gap: 8px;
+}
+.emoji-opt {
+  aspect-ratio: 1; border-radius: 12px; font-size: 22px;
+  background: var(--card); border: 2px solid transparent;
+  cursor: pointer; display: flex; align-items: center; justify-content: center;
+  transition: all 0.15s;
+}
+.emoji-opt:hover { background: var(--card2); transform: scale(1.1); }
+.emoji-opt.selected { border-color: var(--purple); background: rgba(155,48,255,0.2); box-shadow: 0 0 12px rgba(155,48,255,0.3); }
+
+/* Category pills */
+.cat-pills { display: flex; gap: 8px; flex-wrap: wrap; }
+.cat-pill {
+  padding: 7px 14px; border-radius: 20px; font-size: 12px; font-weight: 600;
+  background: var(--card); border: 1px solid var(--border);
+  cursor: pointer; transition: all 0.15s; color: var(--muted);
+}
+.cat-pill.selected { background: rgba(155,48,255,0.2); border-color: var(--purple); color: var(--purple2); }
+
+/* ═══════════════════════════════════════════════
+   HABIT DETAIL SCREEN
+═══════════════════════════════════════════════ */
+.detail-content { padding: 0; flex: 1; overflow-y: auto; padding-bottom: 100px; }
+
+.detail-hero {
+  padding: 28px 20px 24px;
+  background: linear-gradient(180deg, var(--surface) 0%, transparent 100%);
+  border-bottom: 1px solid var(--border);
+  text-align: center;
+}
+
+.hero-emoji { font-size: 56px; margin-bottom: 12px; display: block; filter: drop-shadow(0 0 20px rgba(155,48,255,0.5)); animation: pulseGlow 3s ease-in-out infinite; }
+@keyframes pulseGlow { 0%,100%{filter:drop-shadow(0 0 20px rgba(155,48,255,0.5))} 50%{filter:drop-shadow(0 0 30px rgba(155,48,255,0.8))} }
+
+.hero-name { font-family: Georgia, 'Times New Roman', serif; font-size: 26px; font-weight: 700; color: var(--white); margin-bottom: 10px; }
+.hero-rank { font-size: 13px; color: var(--muted); margin-bottom: 20px; }
+
+/* Rank ring */
+.rank-ring-wrap { display: flex; justify-content: center; margin-bottom: 20px; }
+.rank-ring {
+  width: 120px; height: 120px; position: relative;
+  display: flex; align-items: center; justify-content: center;
+}
+.rank-ring svg { position: absolute; inset: 0; transform: rotate(-90deg); }
+.rank-ring-inner { text-align: center; z-index: 1; }
+.rank-ring-num { font-size: 32px; font-weight: 900; line-height: 1; }
+.rank-ring-lbl { font-size: 10px; color: var(--muted); letter-spacing: 0.1em; }
+
+/* Detail stats grid */
+.detail-stats {
+  display: grid; grid-template-columns: repeat(2, 1fr);
+  gap: 10px; padding: 16px 20px;
+}
+
+.dstat {
+  background: var(--card); border: 1px solid var(--border);
+  border-radius: 14px; padding: 14px; text-align: center;
+}
+.dstat-val { font-size: 24px; font-weight: 900; line-height: 1; margin-bottom: 4px; }
+.dstat-lbl { font-size: 10px; color: var(--muted); }
+
+/* Log section */
+.log-section { padding: 16px 20px; }
+
+.quality-slider-wrap { margin-bottom: 16px; }
+.quality-val { font-size: 36px; font-weight: 900; text-align: center; margin-bottom: 8px; }
+input[type=range] {
+  width: 100%; height: 6px; border-radius: 3px;
+  background: var(--card2); outline: none; cursor: pointer;
+  -webkit-appearance: none; appearance: none;
+}
+input[type=range]::-webkit-slider-thumb {
+  -webkit-appearance: none; width: 20px; height: 20px; border-radius: 50%;
+  background: var(--purple); cursor: pointer;
+  box-shadow: 0 0 10px rgba(155,48,255,0.5);
+}
+
+.pressure-toggle {
+  display: flex; align-items: center; justify-content: space-between;
+  background: var(--card); border: 1px solid var(--border);
+  border-radius: 14px; padding: 14px 16px; margin-bottom: 12px;
+  cursor: pointer; transition: all 0.2s;
+}
+.pressure-toggle:hover { border-color: var(--border2); }
+.pressure-toggle.active { background: rgba(255,34,68,0.08); border-color: rgba(255,34,68,0.3); }
+
+.toggle-switch {
+  width: 44px; height: 24px; border-radius: 12px;
+  background: var(--card2); position: relative; transition: all 0.3s;
+}
+.toggle-switch::after {
+  content: ''; position: absolute; left: 3px; top: 3px;
+  width: 18px; height: 18px; border-radius: 50%;
+  background: var(--muted); transition: all 0.3s;
+}
+.pressure-toggle.active .toggle-switch { background: rgba(255,34,68,0.4); }
+.pressure-toggle.active .toggle-switch::after { left: 23px; background: var(--crimson); }
+
+.challenge-toggle.active .toggle-switch { background: rgba(255,215,0,0.3); }
+.challenge-toggle.active .toggle-switch::after { left: 23px; background: var(--gold); }
+
+/* Breakthrough section */
+.bt-section {
+  margin: 16px 20px;
+  border-radius: 16px; overflow: hidden;
+  border: 1px solid rgba(255,215,0,0.2);
+  background: rgba(255,215,0,0.04);
+}
+.bt-header {
+  padding: 14px 16px;
+  background: rgba(255,215,0,0.08);
+  display: flex; align-items: center; gap: 10px;
+}
+.bt-icon { font-size: 20px; }
+.bt-title { font-size: 13px; font-weight: 700; color: var(--gold); }
+.bt-sub { font-size: 11px; color: var(--muted); }
+.bt-body { padding: 14px 16px; }
+.bt-progress { margin-bottom: 10px; }
+.bt-bar-track { height: 6px; background: rgba(255,215,0,0.1); border-radius: 3px; overflow: hidden; }
+.bt-bar-fill { height: 100%; background: linear-gradient(90deg, var(--gold2), var(--gold)); border-radius: 3px; transition: width 0.8s ease; }
+
+/* Degradation warning */
+.degradation-warning {
+  margin: 0 20px 16px;
+  padding: 12px 16px;
+  border-radius: 12px;
+  background: rgba(255,34,68,0.08);
+  border: 1px solid rgba(255,34,68,0.25);
+  display: none;
+}
+.degradation-warning.show { display: block; }
+.dw-title { font-size: 12px; font-weight: 700; color: var(--crimson); margin-bottom: 4px; }
+.dw-text { font-size: 11px; color: var(--muted); }
+
+/* ═══════════════════════════════════════════════
+   RANKS SCREEN
+═══════════════════════════════════════════════ */
+.ranks-content { padding: 16px; flex: 1; overflow-y: auto; padding-bottom: 100px; }
+
+.rank-card {
+  background: var(--card); border: 1px solid var(--border);
+  border-radius: 18px; margin-bottom: 12px; overflow: hidden;
+  cursor: pointer; transition: all 0.2s;
+}
+.rank-card:hover { border-color: var(--border2); }
+
+.rank-card-header {
+  padding: 16px 18px;
+  display: flex; align-items: center; gap: 14px;
+}
+.rank-num-badge {
+  width: 46px; height: 46px; border-radius: 12px;
+  display: flex; align-items: center; justify-content: center;
+  font-size: 22px; font-weight: 900; flex-shrink: 0;
+}
+.rank-card-info { flex: 1; }
+.rank-card-name { font-size: 14px; font-weight: 700; margin-bottom: 2px; }
+.rank-card-en { font-size: 11px; color: var(--muted); font-style: italic; }
+
+.rank-card-body { padding: 0 18px 16px; display: none; }
+.rank-card-body.open { display: block; }
+
+.rank-detail-item { margin-bottom: 12px; }
+.rank-detail-label { font-size: 10px; font-weight: 700; letter-spacing: 0.1em; color: var(--muted); text-transform: uppercase; margin-bottom: 6px; }
+.rank-detail-text { font-size: 13px; color: var(--text); line-height: 1.7; }
+.rank-req-list { list-style: none; }
+.rank-req-list li { font-size: 12px; color: var(--text); padding: 3px 0; padding-right: 14px; position: relative; line-height: 1.5; }
+.rank-req-list li::before { content: '◆'; position: absolute; right: 0; font-size: 8px; color: var(--purple2); top: 5px; }
+
+/* ═══════════════════════════════════════════════
+   BOTTOM NAV
+═══════════════════════════════════════════════ */
+.bottom-nav {
+  position: fixed; bottom: 0; left: 50%; transform: translateX(-50%);
+  width: 100%; max-width: 480px;
+  background: rgba(7,0,15,0.92); backdrop-filter: blur(24px);
+  border-top: 1px solid var(--border);
+  display: flex; padding: 10px 0 16px;
+  z-index: 200;
+}
+
+.nav-item {
+  flex: 1; display: flex; flex-direction: column;
+  align-items: center; gap: 4px;
+  cursor: pointer; transition: all 0.2s;
+}
+.nav-icon { font-size: 22px; transition: all 0.2s; }
+.nav-label { font-size: 9px; font-weight: 700; letter-spacing: 0.08em; color: var(--muted); text-transform: uppercase; }
+.nav-item.active .nav-icon { filter: drop-shadow(0 0 6px rgba(155,48,255,0.8)); transform: translateY(-2px); }
+.nav-item.active .nav-label { color: var(--purple2); }
+
+/* FAB */
+.fab {
+  position: fixed; bottom: 80px; left: 50%; transform: translateX(-50%) translateX(140px);
+  width: 56px; height: 56px; border-radius: 50%;
+  background: linear-gradient(135deg, var(--purple), #6010cc);
+  border: none; color: white; font-size: 26px;
+  display: flex; align-items: center; justify-content: center;
+  cursor: pointer; box-shadow: 0 4px 20px rgba(155,48,255,0.5);
+  transition: all 0.3s cubic-bezier(0.34,1.56,0.64,1);
+  z-index: 150;
+}
+.fab:hover { transform: translateX(-50%) translateX(140px) scale(1.1); box-shadow: 0 8px 30px rgba(155,48,255,0.7); }
+
+/* ═══════════════════════════════════════════════
+   BUTTONS
+═══════════════════════════════════════════════ */
+.btn-primary {
+  width: 100%; padding: 16px; border-radius: 14px; border: none;
+  background: linear-gradient(135deg, var(--purple), #6010cc);
+  color: white; font-family: 'Segoe UI', Tahoma, Arial, sans-serif; font-size: 16px; font-weight: 700;
+  cursor: pointer; transition: all 0.2s;
+  box-shadow: 0 4px 20px rgba(155,48,255,0.4);
+}
+.btn-primary:hover { transform: translateY(-1px); box-shadow: 0 8px 30px rgba(155,48,255,0.5); }
+.btn-primary:active { transform: translateY(0); }
+
+.btn-ghost {
+  width: 100%; padding: 14px; border-radius: 14px;
+  border: 1px solid var(--border); background: transparent;
+  color: var(--muted); font-family: 'Segoe UI', Tahoma, Arial, sans-serif; font-size: 14px;
+  cursor: pointer; transition: all 0.2s; margin-top: 10px;
+}
+.btn-ghost:hover { border-color: var(--border2); color: var(--text); }
+
+/* Log button */
+.log-btn {
+  width: 100%; padding: 16px; border-radius: 14px; border: none;
+  background: linear-gradient(135deg, #006633, #00aa55);
+  color: white; font-family: 'Segoe UI', Tahoma, Arial, sans-serif; font-size: 16px; font-weight: 700;
+  cursor: pointer; transition: all 0.2s;
+  box-shadow: 0 4px 20px rgba(0,170,85,0.3);
+}
+.log-btn:hover { transform: translateY(-1px); box-shadow: 0 8px 30px rgba(0,170,85,0.4); }
+.log-btn.logged { background: var(--card); border: 1px solid rgba(0,255,136,0.3); color: var(--emerald); cursor: default; box-shadow: none; }
+
+/* ═══════════════════════════════════════════════
+   BACK BUTTON
+═══════════════════════════════════════════════ */
+.back-btn {
+  background: none; border: none; color: var(--muted);
+  font-size: 20px; cursor: pointer; padding: 4px 8px;
+  transition: color 0.2s; display: flex; align-items: center; gap: 6px;
+}
+.back-btn:hover { color: var(--text); }
+.back-btn span { font-family: 'Segoe UI', Tahoma, Arial, sans-serif; font-size: 13px; }
+
+/* ═══════════════════════════════════════════════
+   TOAST
+═══════════════════════════════════════════════ */
+.toast {
+  position: fixed; bottom: 90px; left: 50%;
+  transform: translateX(-50%) translateY(20px);
+  background: var(--card2); border: 1px solid var(--border2);
+  color: var(--text); padding: 12px 24px; border-radius: 40px;
+  font-size: 13px; font-weight: 600; font-family: 'Segoe UI', Tahoma, Arial, sans-serif;
+  box-shadow: 0 8px 30px rgba(0,0,0,0.5);
+  opacity: 0; transition: all 0.35s cubic-bezier(0.34,1.56,0.64,1);
+  z-index: 999; white-space: nowrap; pointer-events: none;
+}
+.toast.show { opacity: 1; transform: translateX(-50%) translateY(0); }
+.toast.gold { background: rgba(255,170,0,0.15); border-color: rgba(255,215,0,0.4); color: var(--gold); }
+.toast.green { background: rgba(0,255,136,0.1); border-color: rgba(0,255,136,0.3); color: var(--emerald); }
+.toast.red { background: rgba(255,34,68,0.1); border-color: rgba(255,34,68,0.3); color: var(--crimson); }
+
+/* ═══════════════════════════════════════════════
+   RANK UP CELEBRATION
+═══════════════════════════════════════════════ */
+.rank-up-overlay {
+  position: fixed; inset: 0; z-index: 2000;
+  background: rgba(0,0,0,0.85); backdrop-filter: blur(10px);
+  display: none; align-items: center; justify-content: center;
+  animation: overlayIn 0.3s ease;
+}
+.rank-up-overlay.show { display: flex; }
+@keyframes overlayIn { from{opacity:0} to{opacity:1} }
+
+.rank-up-card {
+  background: var(--bg2); border: 2px solid var(--gold);
+  border-radius: 24px; padding: 40px 32px; text-align: center;
+  max-width: 320px; width: 90%;
+  box-shadow: 0 0 60px rgba(255,215,0,0.3);
+  animation: cardPop 0.5s cubic-bezier(0.34,1.56,0.64,1);
+}
+@keyframes cardPop { from{transform:scale(0.7)} to{transform:scale(1)} }
+
+.rank-up-title { font-family: Georgia, 'Times New Roman', serif; font-size: 28px; color: var(--gold); margin-bottom: 8px; }
+.rank-up-sub { font-size: 13px; color: var(--muted); margin-bottom: 24px; }
+.rank-up-icon { font-size: 72px; margin-bottom: 20px; display: block; animation: bounce 1s ease infinite; }
+@keyframes bounce { 0%,100%{transform:translateY(0) scale(1)} 50%{transform:translateY(-12px) scale(1.05)} }
+.rank-up-name { font-size: 18px; font-weight: 700; color: var(--white); margin-bottom: 6px; }
+.rank-up-rank { font-size: 13px; color: var(--gold2); }
+
+/* ═══════════════════════════════════════════════
+   HISTORY CHART
+═══════════════════════════════════════════════ */
+.history-section { padding: 16px 20px; }
+.history-dots { display: flex; gap: 4px; align-items: flex-end; height: 60px; }
+.h-dot { flex: 1; border-radius: 3px 3px 0 0; min-height: 4px; background: var(--card2); transition: all 0.3s; cursor: pointer; }
+.h-dot.done { background: linear-gradient(180deg, var(--purple2), var(--purple)); }
+.h-dot.done-high { background: linear-gradient(180deg, var(--gold), var(--gold2)); }
+.h-dot:hover { opacity: 0.8; }
+
+/* ═══════════════════════════════════════════════
+   SCROLLBAR
+═══════════════════════════════════════════════ */
+::-webkit-scrollbar { width: 4px; }
+::-webkit-scrollbar-track { background: transparent; }
+::-webkit-scrollbar-thumb { background: var(--card2); border-radius: 2px; }
+
+/* ═══════════════════════════════════════════════
+   UTILITIES
+═══════════════════════════════════════════════ */
+.mt8 { margin-top: 8px; }
+.mt16 { margin-top: 16px; }
+.mt20 { margin-top: 20px; }
+.flex-between { display: flex; justify-content: space-between; align-items: center; }
+.text-muted { color: var(--muted); font-size: 12px; }
+
+/* Divider */
+.divider { height: 1px; background: var(--border); margin: 16px 0; }
+</style>
+</head>
+<body>
+
+<!-- ════════════════════════════════════════════
+     SCREENS
+════════════════════════════════════════════ -->
+
+<!-- HOME -->
+<div class="screen active app" id="screen-home">
+  <div class="top-bar">
+    <div class="logo">
+      مسار الزراعة
+      <span>Cultivation Path</span>
+    </div>
+    <div style="display:flex;gap:8px">
+      <button class="icon-btn" onclick="showScreen('screen-ranks')" title="المستويات">⚡</button>
+    </div>
+  </div>
+
+  <div class="home-content" id="home-content">
+    <!-- Summary -->
+    <div class="summary-strip">
+      <div class="summary-card">
+        <div class="val val-purple" id="stat-habits">0</div>
+        <div class="lbl">مسار نشط</div>
+      </div>
+      <div class="summary-card">
+        <div class="val val-gold" id="stat-done">0</div>
+        <div class="lbl">أُنجز اليوم</div>
+      </div>
+      <div class="summary-card">
+        <div class="val val-cyan" id="stat-essence">0</div>
+        <div class="lbl">إجمالي الجوهر</div>
+      </div>
+    </div>
+
+    <div class="section-title">مساراتك اليوم</div>
+    <div class="habits-container" id="habits-list"></div>
+  </div>
+</div>
+
+<!-- ADD HABIT -->
+<div class="screen app" id="screen-add">
+  <div class="top-bar">
+    <button class="back-btn" onclick="showScreen('screen-home')">
+      ← <span>رجوع</span>
+    </button>
+    <div class="logo">مسار جديد</div>
+    <div style="width:80px"></div>
+  </div>
+
+  <div class="add-content">
+    <div class="form-group">
+      <label class="form-label">اسم العادة</label>
+      <input class="form-input" id="habit-name-input" type="text" placeholder="مثال: قراءة 30 دقيقة يومياً" maxlength="60">
+    </div>
+
+    <div class="form-group">
+      <label class="form-label">اختر رمزاً</label>
+      <div class="emoji-grid" id="emoji-grid">
+        <!-- filled by JS -->
+      </div>
+    </div>
+
+    <div class="form-group">
+      <label class="form-label">الفئة</label>
+      <div class="cat-pills" id="cat-pills">
+        <div class="cat-pill selected" data-cat="عقل">🧠 عقل</div>
+        <div class="cat-pill" data-cat="جسد">💪 جسد</div>
+        <div class="cat-pill" data-cat="روح">🌿 روح</div>
+        <div class="cat-pill" data-cat="إبداع">🎨 إبداع</div>
+        <div class="cat-pill" data-cat="علاقات">🤝 علاقات</div>
+      </div>
+    </div>
+
+    <button class="btn-primary" onclick="addHabit()">✦ ابدأ مسار الزراعة</button>
+    <button class="btn-ghost" onclick="showScreen('screen-home')">إلغاء</button>
+  </div>
+</div>
+
+<!-- HABIT DETAIL -->
+<div class="screen app" id="screen-detail">
+  <div class="top-bar">
+    <button class="back-btn" onclick="showScreen('screen-home')">
+      ← <span>رجوع</span>
+    </button>
+    <div id="detail-top-title" style="font-family:Georgia,serif;font-size:16px;color:var(--purple2)"></div>
+    <button class="icon-btn" id="delete-btn" onclick="deleteCurrentHabit()">🗑</button>
+  </div>
+
+  <div class="detail-content" id="detail-content">
+    <!-- filled by JS -->
+  </div>
+</div>
+
+<!-- RANKS REFERENCE -->
+<div class="screen app" id="screen-ranks">
+  <div class="top-bar">
+    <button class="back-btn" onclick="showScreen('screen-home')">
+      ← <span>رجوع</span>
+    </button>
+    <div class="logo">المستويات التسعة</div>
+    <div style="width:80px"></div>
+  </div>
+
+  <div class="ranks-content" id="ranks-content">
+    <!-- filled by JS -->
+  </div>
+</div>
+
+<!-- ════════════════════════════════════════════
+     BOTTOM NAV
+════════════════════════════════════════════ -->
+<nav class="bottom-nav" id="bottom-nav">
+  <div class="nav-item active" onclick="showScreen('screen-home')" data-screen="home">
+    <div class="nav-icon">🌱</div>
+    <div class="nav-label">مساراتي</div>
+  </div>
+  <div class="nav-item" onclick="showScreen('screen-ranks')" data-screen="ranks">
+    <div class="nav-icon">⚡</div>
+    <div class="nav-label">المراتب</div>
+  </div>
+</nav>
+
+<!-- FAB -->
+<button class="fab" onclick="showScreen('screen-add')" id="fab">+</button>
+
+<!-- TOAST -->
+<div class="toast" id="toast"></div>
+
+<!-- RANK UP OVERLAY -->
+<div class="rank-up-overlay" id="rank-up-overlay" onclick="closeRankUp()">
+  <div class="rank-up-card" onclick="event.stopPropagation()">
+    <div class="rank-up-sub">🎊 اختراق حاجز جديد 🎊</div>
+    <span class="rank-up-icon" id="ru-icon"></span>
+    <div class="rank-up-title" id="ru-title">ترقية المستوى!</div>
+    <div class="rank-up-name" id="ru-name"></div>
+    <div class="rank-up-rank" id="ru-rank"></div>
+    <br>
+    <button class="btn-primary" onclick="closeRankUp()" style="margin-top:16px">واصل المسير ✦</button>
+  </div>
+</div>
+
+<!-- ════════════════════════════════════════════
+     JAVASCRIPT
+════════════════════════════════════════════ -->
+<script>
+// ═══════════════════════════
+// DATA CONFIG
+// ═══════════════════════════
+const EMOJIS = ['📚','💪','🧘','🏃','💧','🌙','🥗','✍️','🎯','🎨','🎵','🌿','🔬','💊','🌅','🧠','🎭','🏊','🚴','🧩','🌍','📖','🎻','🍃'];
+
+const RANKS = [
+  { r:1, name:'الممارس الساذج', en:'Naive Practitioner', icon:'🌱', color:'#7c4dbb', bg:'#3d1a6e',
+    psycho:'تبدأ الرحلة — كل أداء يتطلب قرارًا واعيًا. العادة خارجية لم تتجذر بعد.',
+    quant:['7 أيام متتالية','معدل إكمال 80%'],
+    qual:['تسجيل الأداء يدوياً في كل مرة'],
+    essence_req:0, xp_to_next:500, degradation:'غياب يومين = إعادة streak للصفر' },
+  { r:2, name:'المواظب المتعثر', en:'Struggling Consistent', icon:'🔥', color:'#9040d0', bg:'#4a1080',
+    psycho:'بدأت ترى الأنماط. الفشل لم يعد كارثة — بل معلومة. "أحاول أن أكون شخصاً يفعل هذا".',
+    quant:['30 يوماً تراكمية','معدل أسبوعي ≥ 70%','انتكاس ≤ 2 مرات/شهر'],
+    qual:['تحديد وقت ثابت واحد للأداء','توثيق سبب الفشل عند الانقطاع'],
+    essence_req:3, xp_to_next:1200, degradation:'4 أيام غياب/أسبوع = خسارة 20% XP' },
+  { r:3, name:'الراسخ في البداية', en:'Grounded Beginner', icon:'⚡', color:'#a050e8', bg:'#5510a0',
+    psycho:'العادة وجدت مكانها. غيابها يُزعجك — وهذا أول دليل على التكامل الفعلي.',
+    quant:['90 يوماً تراكمية','streak ≥ 21 يوماً','معدل شهري ≥ 80%'],
+    qual:['أداء مرة واحدة تحت ضغط موثق','معيار جودة ذاتي أولي'],
+    essence_req:5, xp_to_next:2500, degradation:'انتكاس ثانٍ في الشهر = إنذار مستوى' },
+  { r:4, name:'المترسّخ الواعي', en:'Conscious Integrator', icon:'🌙', color:'#b060ff', bg:'#6210b8',
+    psycho:'أصبحت تُفكر في الجودة وليس فقط الاستمرارية. هذا الفصل بين "أفعل" و"أهتم بكيف أفعل".',
+    quant:['180 يوماً','streak ≥ 45','جودة متوسط ≥ 60'],
+    qual:['تحسين موثق في الجودة','3 أداءات تحت ظروف صعبة'],
+    essence_req:15, xp_to_next:5000, degradation:'جودة منخفضة أسبوعين = توقف تراكم الجوهر' },
+  { r:5, name:'الثابت في الأزمات', en:'Crisis-Stable', icon:'🌊', color:'#c070ff', bg:'#7020cc',
+    psycho:'نقطة اللاعودة الأولى. الفعل يحدث تلقائياً في الضغط. وقت التعافي انخفض جذرياً.',
+    quant:['365 يوماً','streak ≥ 90','5 أحداث ضغط كبرى'],
+    qual:['تحدٍّ طوعي واحد','تعافٍ موثق ≤ 48 ساعة × 3 مرات'],
+    essence_req:40, xp_to_next:10000, degradation:'انتكاس > 7 أيام = سقوط لـ Rank 4!' },
+  { r:6, name:'العارف بحدوده', en:'Wisdom-Bound Expert', icon:'💎', color:'#d080ff', bg:'#8030e0',
+    psycho:'بداية الإتقان الحقيقي. مجهود أقل، نتيجة أفضل. تفهم الأنماط العميقة لأدائك.',
+    quant:['730 يوماً','streak ≥ 150','10 تحديات طوعية'],
+    qual:['خريطة أنماط شخصية موثقة','3 متغيرات مؤثرة محددة'],
+    essence_req:100, xp_to_next:25000, degradation:'انتكاس > 5 أيام = سقوط لـ Rank 5!' },
+  { r:7, name:'الراسخ في الفوضى', en:'Chaos-Immune Adept', icon:'⭐', color:'#ffa030', bg:'#401000',
+    psycho:'العادة اندمجت مع الهوية. لا تقول "أفعل X" بل "أنا X". الهوية تحمي العادة الآن.',
+    quant:['1095 يوماً','streak ≥ 200','3 أزمات كبرى مكتملة'],
+    qual:['توثيق تغيير الهوية الذاتية','25 تحدي طوعي'],
+    essence_req:200, xp_to_next:60000, degradation:'ضعف الهوية = تجميد الجوهر' },
+  { r:8, name:'المُجسِّد الكفء', en:'Effortless Embodier', icon:'🌌', color:'#ffb840', bg:'#4a1200',
+    psycho:'الكمال في الكفاءة. لا تسأل "هل سأفعل؟" بل "كيف أجعله أفضل؟". تبدأ تُلهم الآخرين.',
+    quant:['1825 يوماً','streak ≥ 365','3 أشخاص وصلوا لـ Rank 2 بمساعدتك'],
+    qual:['نظام أداء شخصي موثق كاملاً','مشروع التأثير مكتمل'],
+    essence_req:400, xp_to_next:150000, degradation:'يحتاج انتكاس > 30 يوم للسقوط' },
+  { r:9, name:'حامل الجوهر الخالص', en:'Pure Essence Bearer', icon:'✦', color:'#ffd700', bg:'#1a0800',
+    psycho:'العادة لم تعد عادة. أصبحت طبيعة. أنت تُجسِّد المبدأ لا تمارسه. حضورك كافٍ لإلهام الآخرين.',
+    quant:['3650 يوماً','streak ≥ 730','10 أشخاص وصلوا لـ Rank 3+'],
+    qual:['وصية الجوهر مكتوبة','منهج زراعة قابل للتعليم'],
+    essence_req:1000, xp_to_next:null, degradation:'التحقق يُعاد كل 6 أشهر' },
+];
+
+const RANK_REQUIREMENTS = [
+  {days:0,   streak:0,   essence:0},
+  {days:30,  streak:7,   essence:3},
+  {days:90,  streak:21,  essence:5},
+  {days:180, streak:45,  essence:15},
+  {days:365, streak:90,  essence:40},
+  {days:730, streak:150, essence:100},
+  {days:1095,streak:200, essence:200},
+  {days:1825,streak:365, essence:400},
+  {days:3650,streak:730, essence:1000},
+];
+
+// ═══════════════════════════
+// STATE
+// ═══════════════════════════
+let habits = [];
+let currentHabitId = null;
+let selectedEmoji = '📚';
+let selectedCat = 'عقل';
+
+function loadData() {
+  try {
+    const raw = localStorage.getItem('cultivation_habits_v3') || sessionStorage.getItem('cultivation_habits_v3');
+    habits = raw ? JSON.parse(raw) : [];
+  } catch(e) { habits = []; }
+}
+function saveData() {
+  try {
+    localStorage.setItem('cultivation_habits_v3', JSON.stringify(habits));
+  } catch(e) {
+    // fallback to sessionStorage
+    try { sessionStorage.setItem('cultivation_habits_v3', JSON.stringify(habits)); } catch(e2) {}
+  }
+}
+
+function todayKey() {
+  const d = new Date();
+  return `${d.getFullYear()}-${String(d.getMonth()+1).padStart(2,'0')}-${String(d.getDate()).padStart(2,'0')}`;
+}
+
+function daysAgoKey(n) {
+  const d = new Date(); d.setDate(d.getDate()-n);
+  return `${d.getFullYear()}-${String(d.getMonth()+1).padStart(2,'0')}-${String(d.getDate()).padStart(2,'0')}`;
+}
+
+// ═══════════════════════════
+// XP & RANK ENGINE
+// ═══════════════════════════
+function calcStreak(logs) {
+  let s = 0;
+  const today = todayKey();
+  let d = new Date();
+  while (true) {
+    const key = `${d.getFullYear()}-${String(d.getMonth()+1).padStart(2,'0')}-${String(d.getDate()).padStart(2,'0')}`;
+    const entry = logs[key];
+    if (entry && entry.done) { s++; d.setDate(d.getDate()-1); }
+    else break;
+  }
+  return s;
+}
+
+function calcTotalDays(logs) {
+  return Object.values(logs).filter(l => l.done).length;
+}
+
+function calcEssence(habit) {
+  const logs = habit.logs;
+  let essence = habit.essence_base || 0;
+
+  // +1 per 5 streak days
+  essence += Math.floor(habit.streak / 5);
+
+  // +quality bonuses
+  const recent = getLast30DaysQuality(logs);
+  if (recent.avg >= 80) essence += 3;
+  else if (recent.avg >= 70) essence += 1;
+
+  // pressure events
+  const pressureCount = Object.values(logs).filter(l => l.pressure).length;
+  essence += pressureCount * 3;
+
+  // voluntary challenges
+  const challengeCount = Object.values(logs).filter(l => l.challenge).length;
+  essence += challengeCount * 8;
+
+  return Math.min(essence, 1000);
+}
+
+function getLast30DaysQuality(logs) {
+  let sum = 0, cnt = 0;
+  for (let i = 0; i < 30; i++) {
+    const k = daysAgoKey(i);
+    if (logs[k] && logs[k].done && logs[k].quality) {
+      sum += logs[k].quality; cnt++;
+    }
+  }
+  return { avg: cnt > 0 ? sum/cnt : 0, count: cnt };
+}
+
+function calcXP(habit, rank) {
+  const rm = [1, 1.2, 1.5, 1.8, 2.2, 2.8, 3.5, 4.5, 6.0][rank-1];
+  const logs = habit.logs;
+  const streak = habit.streak;
+  const totalDays = habit.total_days;
+  const quality = getLast30DaysQuality(logs);
+  const pressure = Object.values(logs).filter(l=>l.pressure).length;
+  const challenges = Object.values(logs).filter(l=>l.challenge).length;
+
+  let xp = 0;
+  xp += streak * 10 * rm;
+  xp += totalDays * 5 * rm;
+  xp += quality.avg * 0.5 * rm;
+  xp += pressure * 25 * rm;
+  xp += challenges * 40 * rm;
+  xp += habit.essence * (rank * 0.05);
+  return Math.floor(xp);
+}
+
+function checkRankUp(habit) {
+  const nextRank = habit.rank + 1;
+  if (nextRank > 9) return false;
+  const req = RANK_REQUIREMENTS[nextRank - 1];
+  return (
+    habit.total_days >= req.days &&
+    habit.streak >= req.streak &&
+    habit.essence >= req.essence
+  );
+}
+
+function checkDegradation(habit) {
+  // Check last activity
+  const today = todayKey();
+  let gapDays = 0;
+  let d = new Date(); d.setDate(d.getDate()-1);
+  while (gapDays < 40) {
+    const k = `${d.getFullYear()}-${String(d.getMonth()+1).padStart(2,'0')}-${String(d.getDate()).padStart(2,'0')}`;
+    if (habit.logs[k] && habit.logs[k].done) break;
+    gapDays++; d.setDate(d.getDate()-1);
+  }
+  return gapDays;
+}
+
+// ═══════════════════════════
+// HABIT CRUD
+// ═══════════════════════════
+function addHabit() {
+  const name = document.getElementById('habit-name-input').value.trim();
+  if (!name) { showToast('أدخل اسم العادة أولاً', 'red'); return; }
+
+  const habit = {
+    id: Date.now(),
+    name, emoji: selectedEmoji, category: selectedCat,
+    rank: 1, logs: {}, streak: 0, total_days: 0,
+    essence: 0, essence_base: 0, xp: 0,
+    created: todayKey(),
+  };
+
+  habits.push(habit);
+  saveData();
+  document.getElementById('habit-name-input').value = '';
+  showScreen('screen-home');
+  renderHome();
+  showToast('✦ مسار جديد بدأ رحلته', 'gold');
+}
+
+function deleteCurrentHabit() {
+  if (!currentHabitId) return;
+  if (!confirm('هل أنت متأكد من حذف هذا المسار؟ لا يمكن التراجع.')) return;
+  habits = habits.filter(h => h.id !== currentHabitId);
+  saveData();
+  showScreen('screen-home');
+  renderHome();
+  showToast('تم حذف المسار', 'red');
+}
+
+// ═══════════════════════════
+// LOG HABIT
+// ═══════════════════════════
+function logHabit(habitId, quality, isPressure, isChallenge) {
+  const habit = habits.find(h => h.id === habitId);
+  if (!habit) return;
+
+  const today = todayKey();
+  const wasLogged = habit.logs[today]?.done;
+
+  if (wasLogged) {
+    // Unlog
+    delete habit.logs[today];
+    habit.streak = calcStreak(habit.logs);
+    habit.total_days = calcTotalDays(habit.logs);
+    habit.essence = calcEssence(habit);
+    habit.xp = calcXP(habit, habit.rank);
+    saveData(); renderDetail(habitId); renderHome();
+    showToast('↩ تم إلغاء تسجيل اليوم');
+    return;
+  }
+
+  // Log
+  let xpGain = 50 * ([1,1.2,1.5,1.8,2.2,2.8,3.5,4.5,6][habit.rank-1]);
+  if (isPressure) xpGain *= 1.5;
+  if (isChallenge) xpGain *= 2;
+
+  habit.logs[today] = { done: true, quality: quality || 70, pressure: isPressure, challenge: isChallenge, ts: Date.now() };
+  habit.streak = calcStreak(habit.logs);
+  habit.total_days = calcTotalDays(habit.logs);
+  habit.essence = calcEssence(habit);
+
+  // Essence accumulation
+  if (isPressure) habit.essence_base = (habit.essence_base||0) + 3;
+  if (isChallenge) habit.essence_base = (habit.essence_base||0) + 8;
+  if (habit.streak % 5 === 0 && habit.streak > 0) habit.essence_base = (habit.essence_base||0) + 1;
+  habit.essence = calcEssence(habit);
+
+  const oldRank = habit.rank;
+  habit.xp = calcXP(habit, habit.rank);
+
+  // Check rank up
+  if (checkRankUp(habit)) {
+    habit.rank++;
+    habit.xp = 0; // reset XP within rank
+    saveData(); renderHome(); renderDetail(habitId);
+    showRankUp(habit, oldRank);
+    return;
+  }
+
+  saveData(); renderDetail(habitId); renderHome();
+
+  let msg = '✦ تم تسجيل أداء اليوم';
+  if (isPressure) msg = '🔥 أداء تحت الضغط! +جوهر إضافي';
+  if (isChallenge) msg = '⭐ تحدٍّ طوعي! XP مضاعف';
+  showToast(msg, isChallenge ? 'gold' : isPressure ? 'red' : 'green');
+}
+
+// ═══════════════════════════
+// RENDER HOME
+// ═══════════════════════════
+function renderHome() {
+  const today = todayKey();
+  const list = document.getElementById('habits-list');
+  const totalEssence = habits.reduce((s,h) => s + (h.essence||0), 0);
+  const doneToday = habits.filter(h => h.logs[today]?.done).length;
+
+  document.getElementById('stat-habits').textContent = habits.length;
+  document.getElementById('stat-done').textContent = doneToday;
+  document.getElementById('stat-essence').textContent = totalEssence;
+
+  if (habits.length === 0) {
+    list.innerHTML = `
+      <div class="empty-state">
+        <div class="empty-icon">🌱</div>
+        <div class="empty-title">لا يوجد مسار بعد</div>
+        <div class="empty-sub">ابدأ أول مسار زراعتك<br>واضغط + أدناه</div>
+      </div>`;
+    return;
+  }
+
+  list.innerHTML = habits.map(h => {
+    const done = h.logs[today]?.done;
+    const rank = RANKS[h.rank-1];
+    const xpNext = rank.xp_to_next || 1;
+    const xpPct = Math.min((h.xp / xpNext) * 100, 100);
+    const essencePct = h.rank <= 9 ? Math.min((h.essence / (RANKS[h.rank]?.essence_req||1000)) * 100, 100) : 100;
+    const gapDays = checkDegradation(h);
+    const dangerClass = gapDays >= 5 && h.rank >= 5 ? 'style="border-color:rgba(255,34,68,0.35)"' : '';
+
+    // Essence orbs (show 10 orbs as progress)
+    const orbsFilled = Math.round(essencePct / 10);
+    const orbs = Array.from({length:10}, (_,i) => `<div class="orb ${i < orbsFilled ? (h.rank >= 7 ? 'gold-orb' : 'filled') : ''}"></div>`).join('');
+
+    return `
+    <div class="habit-card ${done?'completed':''}" ${dangerClass}
+         style="--rank-color:${rank.color};--rank-bg:${rank.bg}22"
+         onclick="openDetail(${h.id})">
+      <div class="habit-top">
+        <div class="habit-emoji-wrap">${h.emoji}</div>
+        <div class="habit-info">
+          <div class="habit-name">${h.name}</div>
+          <div class="rank-badge" style="--rank-color:${rank.color};--rank-bg:${rank.bg}44">${rank.icon} الرتبة ${h.rank} · ${rank.name}</div>
+        </div>
+        <div class="check-circle ${done?'done':''}" onclick="event.stopPropagation();quickLog(${h.id})">
+          ${done?'✓':''}
+        </div>
+      </div>
+      <div class="xp-bar-wrap">
+        <div class="xp-bar-top">
+          <span>XP المسار</span>
+          <span>${h.xp}${rank.xp_to_next ? ' / '+rank.xp_to_next : ' ✦ MAX'}</span>
+        </div>
+        <div class="xp-bar-track"><div class="xp-bar-fill" style="width:${xpPct}%"></div></div>
+      </div>
+      <div class="habit-stats">
+        <div class="hstat">🔥 <span>${h.streak}</span> يوم</div>
+        <div class="hstat">📅 <span>${h.total_days}</span> إجمالي</div>
+        <div class="hstat">💠 <span>${h.essence}</span> جوهر</div>
+        ${gapDays >= 3 ? `<div class="hstat" style="color:var(--crimson)">⚠️ <span style="color:var(--crimson)">${gapDays}</span> يوم غياب</div>` : ''}
+      </div>
+      <div class="essence-row">
+        <div class="essence-label">جوهر الرتبة التالية:</div>
+        <div class="essence-orbs">${orbs}</div>
+      </div>
+    </div>`;
+  }).join('');
+}
+
+function quickLog(habitId) {
+  const habit = habits.find(h => h.id === habitId);
+  if (!habit) return;
+  const today = todayKey();
+  logHabit(habitId, 70, false, false);
+}
+
+// ═══════════════════════════
+// RENDER DETAIL
+// ═══════════════════════════
+function openDetail(habitId) {
+  currentHabitId = habitId;
+  renderDetail(habitId);
+  showScreen('screen-detail');
+}
+
+function renderDetail(habitId) {
+  const habit = habits.find(h => h.id === habitId);
+  if (!habit) return;
+
+  const rank = RANKS[habit.rank-1];
+  const today = todayKey();
+  const isLogged = habit.logs[today]?.done;
+  const gapDays = checkDegradation(habit);
+  const q30 = getLast30DaysQuality(habit.logs);
+  const nextRankReq = RANKS[habit.rank] || null;
+  const canRankUp = checkRankUp(habit);
+  const xpNext = rank.xp_to_next || 1;
+  const xpPct = Math.min((habit.xp / xpNext) * 100, 100);
+  const btProgress = nextRankReq ? Math.min((habit.total_days / (RANK_REQUIREMENTS[habit.rank]?.days||9999))*100, 100) : 100;
+
+  document.getElementById('detail-top-title').textContent = habit.emoji + ' ' + habit.name;
+
+  // History dots (last 28 days)
+  const histDots = Array.from({length:28}, (_,i) => {
+    const k = daysAgoKey(27-i);
+    const entry = habit.logs[k];
+    const q = entry?.quality || 0;
+    const h = entry?.done ? Math.max(20, q * 0.6) : 4;
+    const cls = !entry?.done ? '' : q >= 80 ? 'done-high' : 'done';
+    return `<div class="h-dot ${cls}" style="height:${h}%" title="${k}: ${entry?.done?'✓':'✗'}"></div>`;
+  }).join('');
+
+  document.getElementById('detail-content').innerHTML = `
+    <!-- Hero -->
+    <div class="detail-hero">
+      <span class="hero-emoji">${habit.emoji}</span>
+      <div class="hero-name">${habit.name}</div>
+      <div class="hero-rank">${rank.icon} الرتبة ${habit.rank} — ${rank.name}</div>
+
+      <!-- Rank Ring -->
+      <div class="rank-ring-wrap">
+        <div class="rank-ring">
+          <svg viewBox="0 0 120 120" width="120" height="120">
+            <circle cx="60" cy="60" r="52" fill="none" stroke="rgba(255,255,255,0.05)" stroke-width="10"/>
+            <circle cx="60" cy="60" r="52" fill="none" stroke="${rank.color}" stroke-width="10"
+              stroke-dasharray="${2*Math.PI*52}" stroke-dashoffset="${2*Math.PI*52*(1-xpPct/100)}"
+              stroke-linecap="round" style="transition:stroke-dashoffset 0.8s ease"/>
+          </svg>
+          <div class="rank-ring-inner">
+            <div class="rank-ring-num" style="color:${rank.color}">${habit.rank}</div>
+            <div class="rank-ring-lbl">RANK</div>
+          </div>
+        </div>
+      </div>
+
+      <div class="text-muted" style="font-size:11px">${rank.psycho}</div>
+    </div>
+
+    <!-- Stats -->
+    <div class="detail-stats">
+      <div class="dstat">
+        <div class="dstat-val" style="color:var(--purple2)">🔥 ${habit.streak}</div>
+        <div class="dstat-lbl">يوم متتالي</div>
+      </div>
+      <div class="dstat">
+        <div class="dstat-val" style="color:var(--cyan)">📅 ${habit.total_days}</div>
+        <div class="dstat-lbl">إجمالي الأيام</div>
+      </div>
+      <div class="dstat">
+        <div class="dstat-val" style="color:var(--gold)">💠 ${habit.essence}</div>
+        <div class="dstat-lbl">جوهر العادة</div>
+      </div>
+      <div class="dstat">
+        <div class="dstat-val" style="color:var(--emerald)">${Math.round(q30.avg)}</div>
+        <div class="dstat-lbl">جودة 30 يوم</div>
+      </div>
+    </div>
+
+    <!-- Degradation Warning -->
+    <div class="degradation-warning ${gapDays >= 3 && habit.rank >= 3 ? 'show' : ''}" style="margin:0 20px 16px">
+      <div class="dw-title">⚠️ تحذير الانتكاس</div>
+      <div class="dw-text">${gapDays} أيام غياب. ${habit.rank >= 5 && gapDays >= 7 ? '🔴 خطر سقوط مستوى!' : 'عد قبل فوات الأوان.'}</div>
+    </div>
+
+    <!-- Breakthrough Progress -->
+    ${nextRankReq ? `
+    <div class="bt-section">
+      <div class="bt-header">
+        <div class="bt-icon">⚡</div>
+        <div>
+          <div class="bt-title">الاختراق للرتبة ${habit.rank+1} — ${RANKS[habit.rank]?.name||''}</div>
+          <div class="bt-sub">${canRankUp ? '🎊 الشروط مكتملة! اضغط "تسجيل اليوم" لفتح الرتبة' : 'استمر في المسير'}</div>
+        </div>
+      </div>
+      <div class="bt-body">
+        <div class="bt-progress">
+          <div class="flex-between" style="font-size:10px;color:var(--muted);margin-bottom:6px">
+            <span>أيام: ${habit.total_days} / ${RANK_REQUIREMENTS[habit.rank]?.days||'?'}</span>
+            <span>جوهر: ${habit.essence} / ${RANK_REQUIREMENTS[habit.rank]?.essence||'?'}</span>
+          </div>
+          <div class="bt-bar-track"><div class="bt-bar-fill" style="width:${btProgress}%"></div></div>
+        </div>
+        <div style="font-size:11px;color:var(--muted)">streak مطلوب: ${RANK_REQUIREMENTS[habit.rank]?.streak||'?'} يوم · حالياً: ${habit.streak}</div>
+      </div>
+    </div>` : '<div style="text-align:center;padding:16px 20px;color:var(--gold);font-family:Amiri,serif;font-size:18px">✦ حامل الجوهر الخالص ✦</div>'}
+
+    <!-- History -->
+    <div class="history-section">
+      <div class="section-title">الأداء — 28 يوم أخيراً</div>
+      <div class="history-dots">${histDots}</div>
+      <div style="display:flex;justify-content:space-between;font-size:10px;color:var(--muted);margin-top:6px">
+        <span>28 يوم مضت</span><span>اليوم</span>
+      </div>
+    </div>
+
+    <!-- Log Section -->
+    <div class="log-section">
+      <div class="section-title">تسجيل أداء اليوم</div>
+
+      ${isLogged ? '' : `
+      <div class="quality-slider-wrap">
+        <div class="quality-val" id="quality-display" style="color:var(--purple2)">70</div>
+        <div style="font-size:11px;color:var(--muted);text-align:center;margin-bottom:10px">جودة الأداء (0-100)</div>
+        <input type="range" min="0" max="100" value="70" id="quality-slider"
+          oninput="document.getElementById('quality-display').textContent=this.value;updateQualityColor(this.value)">
+      </div>
+
+      <div class="pressure-toggle" id="pressure-toggle" onclick="togglePressure()">
+        <div>
+          <div style="font-size:13px;font-weight:700">🔥 حدث ضغط</div>
+          <div class="text-muted">أنجزت العادة في ظرف صعب</div>
+        </div>
+        <div class="toggle-switch"></div>
+      </div>
+
+      <div class="pressure-toggle challenge-toggle" id="challenge-toggle" onclick="toggleChallenge()">
+        <div>
+          <div style="font-size:13px;font-weight:700">⭐ تحدٍّ طوعي</div>
+          <div class="text-muted">صعّدت الشروط بإرادتك</div>
+        </div>
+        <div class="toggle-switch"></div>
+      </div>
+      `}
+
+      <div class="mt16">
+        <button class="${isLogged ? 'log-btn logged' : 'log-btn'}" id="log-btn-main"
+          onclick="${isLogged ? '' : 'submitLog(' + habitId + ')'}">
+          ${isLogged ? '✓ تم التسجيل اليوم' : '✦ تسجيل أداء اليوم'}
+        </button>
+      </div>
+    </div>
+  `;
+}
+
+let pressureActive = false;
+let challengeActive = false;
+
+function togglePressure() {
+  pressureActive = !pressureActive;
+  document.getElementById('pressure-toggle')?.classList.toggle('active', pressureActive);
+}
+function toggleChallenge() {
+  challengeActive = !challengeActive;
+  document.getElementById('challenge-toggle')?.classList.toggle('active', challengeActive);
+}
+function updateQualityColor(v) {
+  const el = document.getElementById('quality-display');
+  if (!el) return;
+  if (v >= 80) el.style.color = 'var(--gold)';
+  else if (v >= 60) el.style.color = 'var(--purple2)';
+  else el.style.color = 'var(--muted)';
+}
+
+function submitLog(habitId) {
+  const q = parseInt(document.getElementById('quality-slider')?.value || 70);
+  logHabit(habitId, q, pressureActive, challengeActive);
+  pressureActive = false; challengeActive = false;
+}
+
+// ═══════════════════════════
+// RANK UP CELEBRATION
+// ═══════════════════════════
+function showRankUp(habit, oldRank) {
+  const rank = RANKS[habit.rank-1];
+  document.getElementById('ru-icon').textContent = rank.icon;
+  document.getElementById('ru-title').textContent = `الرتبة ${habit.rank} مفتوحة!`;
+  document.getElementById('ru-name').textContent = rank.name;
+  document.getElementById('ru-rank').textContent = rank.en;
+  document.getElementById('rank-up-overlay').classList.add('show');
+}
+function closeRankUp() {
+  document.getElementById('rank-up-overlay').classList.remove('show');
+}
+
+// ═══════════════════════════
+// RANKS REFERENCE SCREEN
+// ═══════════════════════════
+function renderRanks() {
+  const c = document.getElementById('ranks-content');
+  c.innerHTML = RANKS.map((r,i) => `
+    <div class="rank-card" onclick="toggleRankCard(${i})">
+      <div class="rank-card-header">
+        <div class="rank-num-badge" style="background:${r.bg};color:${r.color};border:2px solid ${r.color}44">
+          ${r.icon}
+        </div>
+        <div class="rank-card-info">
+          <div class="rank-card-name" style="color:${r.color}">الرتبة ${r.r} — ${r.name}</div>
+          <div class="rank-card-en">${r.en}</div>
+        </div>
+        <div style="color:var(--muted);font-size:14px">▼</div>
+      </div>
+      <div class="rank-card-body" id="rank-body-${i}">
+        <div class="divider"></div>
+        <div class="rank-detail-item">
+          <div class="rank-detail-label">الوصف النفسي</div>
+          <div class="rank-detail-text">${r.psycho}</div>
+        </div>
+        <div class="rank-detail-item">
+          <div class="rank-detail-label">المتطلبات الكمية</div>
+          <ul class="rank-req-list">${r.quant.map(q=>`<li>${q}</li>`).join('')}</ul>
+        </div>
+        <div class="rank-detail-item">
+          <div class="rank-detail-label">المتطلبات النوعية</div>
+          <ul class="rank-req-list">${r.qual.map(q=>`<li>${q}</li>`).join('')}</ul>
+        </div>
+        <div class="rank-detail-item">
+          <div class="rank-detail-label">آلية السقوط</div>
+          <div class="rank-detail-text" style="color:var(--crimson)">${r.degradation}</div>
+        </div>
+        <div class="rank-detail-item">
+          <div class="rank-detail-label">الجوهر المطلوب</div>
+          <div class="rank-detail-text" style="color:var(--purple2)">${r.essence_req} نقطة جوهر</div>
+        </div>
+      </div>
+    </div>
+  `).join('');
+}
+
+function toggleRankCard(i) {
+  const body = document.getElementById(`rank-body-${i}`);
+  body.classList.toggle('open');
+}
+
+// ═══════════════════════════
+// EMOJI GRID
+// ═══════════════════════════
+function renderEmojiGrid() {
+  document.getElementById('emoji-grid').innerHTML = EMOJIS.map(e =>
+    `<div class="emoji-opt ${e===selectedEmoji?'selected':''}" onclick="selectEmoji('${e}')">${e}</div>`
+  ).join('');
+}
+function selectEmoji(e) {
+  selectedEmoji = e;
+  document.querySelectorAll('.emoji-opt').forEach(el => el.classList.toggle('selected', el.textContent===e));
+}
+
+// ═══════════════════════════
+// CATEGORY PILLS
+// ═══════════════════════════
+function initCatPills() {
+  document.querySelectorAll('.cat-pill').forEach(p => {
+    p.onclick = () => {
+      document.querySelectorAll('.cat-pill').forEach(x => x.classList.remove('selected'));
+      p.classList.add('selected');
+      selectedCat = p.dataset.cat;
+    };
+  });
+}
+
+// ═══════════════════════════
+// NAVIGATION
+// ═══════════════════════════
+const SCREEN_NAV_MAP = { 'screen-home':'home', 'screen-ranks':'ranks' };
+const FAB_HIDE = ['screen-add', 'screen-detail', 'screen-ranks'];
+const NAV_HIDE = ['screen-add', 'screen-detail'];
+
+function showScreen(id) {
+  document.querySelectorAll('.screen').forEach(s => s.classList.remove('active'));
+  document.getElementById(id).classList.add('active');
+
+  const nav = document.getElementById('bottom-nav');
+  const fab = document.getElementById('fab');
+  nav.style.display = NAV_HIDE.includes(id) ? 'none' : 'flex';
+  fab.style.display = FAB_HIDE.includes(id) ? 'none' : 'flex';
+
+  document.querySelectorAll('.nav-item').forEach(n => n.classList.remove('active'));
+  const navScreen = SCREEN_NAV_MAP[id];
+  if (navScreen) {
+    document.querySelector(`[data-screen="${navScreen}"]`)?.classList.add('active');
+  }
+
+  if (id === 'screen-add') { renderEmojiGrid(); initCatPills(); }
+  if (id === 'screen-ranks') renderRanks();
+  if (id === 'screen-home') renderHome();
+}
+
+// ═══════════════════════════
+// TOAST
+// ═══════════════════════════
+let toastTimer;
+function showToast(msg, type='') {
+  const t = document.getElementById('toast');
+  t.textContent = msg;
+  t.className = `toast ${type}`;
+  t.classList.add('show');
+  clearTimeout(toastTimer);
+  toastTimer = setTimeout(() => t.classList.remove('show'), 2800);
+}
+
+// ═══════════════════════════
+// INIT
+// ═══════════════════════════
+loadData();
+
+// Seed default habits if empty
+if (habits.length === 0) {
+  habits = [
+    { id: Date.now(), name: 'قراءة 30 دقيقة', emoji: '📚', category: 'عقل', rank: 1, logs: {}, streak: 0, total_days: 0, essence: 0, essence_base: 0, xp: 0, created: todayKey() },
+    { id: Date.now()+1, name: 'ممارسة الرياضة', emoji: '💪', category: 'جسد', rank: 1, logs: {}, streak: 0, total_days: 0, essence: 0, essence_base: 0, xp: 0, created: todayKey() },
+  ];
+  saveData();
+}
+
+renderHome();
+</script>
+<script>
+// Force offline capability
+if ('serviceWorker' in navigator) {
+  const swCode = `
+    const CACHE = 'cult-v2';
+    self.addEventListener('install', e => { self.skipWaiting(); });
+    self.addEventListener('fetch', e => {
+      e.respondWith(
+        caches.open(CACHE).then(cache =>
+          cache.match(e.request).then(cached => {
+            const fresh = fetch(e.request).then(res => { cache.put(e.request, res.clone()); return res; }).catch(()=>cached);
+            return cached || fresh;
+          })
+        )
+      );
+    });
+  `;
+  const blob = new Blob([swCode], {type:'application/javascript'});
+  const url = URL.createObjectURL(blob);
+  navigator.serviceWorker.register(url).catch(()=>{});
+}
+</script>
+</body>
+</html>
